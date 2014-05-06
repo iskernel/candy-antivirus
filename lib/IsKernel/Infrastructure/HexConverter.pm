@@ -1,4 +1,4 @@
-package IsKernel::CandyAntivirus::Infrastructure::HexConverter;
+package IsKernel::Infrastructure::HexConverter;
 
 use warnings;
 use strict;
@@ -32,7 +32,7 @@ Returns:
 Type:
 	Public
 =cut
-sub convertAsciiToHexDump
+sub ascii_to_hex_dump
 {
 	(my $self, my $content) = @_;
 	my @result;
@@ -67,7 +67,7 @@ Returns:
 Type:
 	Public
 =cut
-sub convertHexDumpToAscii
+sub hex_dump_to_ascii
 {
 	(my $self, my $hexDump) = @_;
 	my @chars = split("", $hexDump);

@@ -9,10 +9,9 @@ use File::Basename;
 use File::Spec::Functions;
 use LWP::Simple;
 
-use IsKernel::CandyAntivirus::Infrastructure::RandomStringGenerator;
-use IsKernel::CandyAntivirus::Infrastructure::FileLogger;
-use IsKernel::CandyAntivirus::Infrastructure::HexConverter;
-use IsKernel::CandyAntivirus::Infrastructure::FileManager;
+use IsKernel::Infrastructure::FileHelper;
+use IsKernel::Infrastructure::HexConverter;
+use IsKernel::Infrastructure::StringHelper;
 use IsKernel::CandyAntivirus::Configuration;
 use IsKernel::CandyAntivirus::VirusScanner;
 

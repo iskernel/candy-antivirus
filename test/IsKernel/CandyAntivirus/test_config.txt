@@ -1,0 +1,8 @@
+VIRUS_SIGNATURES_PATH=xvirsig.log
+QUARANTINE_PATH=./Test_Quarantine
+DEFAULT_WORKING_DIRECTORY_PATH=.
+PATH_TO_LOG=log.txt
+PATH_TO_QUARANTINE_LOG=test_qlog.txt
+EXTENSIONS=all
+VIRUS_DETECTED_OPTION=AskUser
+LINK_TO_WWW_DATABASE=http://dystopian-code.googlecode.com/files/xvirsig.log

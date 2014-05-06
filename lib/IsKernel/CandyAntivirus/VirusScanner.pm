@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use v5.14;
 
-use IsKernel::CandyAntivirus::Infrastructure::HexConverter;
-use IsKernel::CandyAntivirus::Infrastructure::FileHelperBase;
-use base qw(IsKernel::CandyAntivirus::Infrastructure::FileHelperBase);
+use IsKernel::Infrastructure::HexConverter;
+use IsKernel::Infrastructure::FileHelper;
+use base qw(IsKernel::Infrastructure::FileHelper);
 
 =pod
 Description:

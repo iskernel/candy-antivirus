@@ -4,8 +4,7 @@ use warnings;
 use strict;
 use v5.14;
 
-use IsKernel::CandyAntivirus::Infrastructure::FileHelperBase;
-use base qw(IsKernel::CandyAntivirus::Infrastructure::FileHelperBase);
+use base qw(IsKernel::Infrastructure::FileHelper);
 
 
 use constant VIRUS_DATABASE_PATH_ID =>"VIRUS_SIGNATURES_PATH";

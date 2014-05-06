@@ -1,4 +1,4 @@
-package IsKernel::CandyAntivirus::Infrastructure::RandomStringGenerator;
+package IsKernel::Infrastructure::StringHelper;
 
 use warnings;
 use strict;
@@ -31,7 +31,7 @@ Returns:
 Type:
 	Public
 =cut
-sub generate
+sub generate_random
 {
 	(my $self, my $length) = @_;
 	$length = $self->{"length"} unless defined $length;
