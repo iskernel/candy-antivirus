@@ -10,10 +10,11 @@ use IsKernel::Infrastructure::FileHelper;
 use IsKernel::Infrastructure::HexConverter;
 use IsKernel::CandyAntivirus::VirusScanner;
 
-use constant DEFAULT_VIRUS_DATABASE_FILE => "xvirsig.cfg";
-use constant DEFAULT_VIRUS_FILE => "./ToScanFiles/file1.txt";
+use constant DEFAULT_VIRUS_DATABASE_FILE => "../../TestFiles/test_xvirsig.cfg";
+use constant DEFAULT_VIRUS_FILE => "../../TestFiles/ToScanFiles/file1.txt";
 
-copy("./ToScanFiles/default_virus_file.txt","./ToScanFiles/file1.txt") or die "Copy failed: $!";
+copy("../../TestFiles/ToScanFiles/default_virus_file.txt","../../TestFiles/ToScanFiles/file1.txt") 
+or die "Copy failed: $!";
 
 my $virusScanner = IsKernel::CandyAntivirus::VirusScanner->new(DEFAULT_VIRUS_DATABASE_FILE);
 my $fileHelper = IsKernel::Infrastructure::FileHelper->new(DEFAULT_VIRUS_FILE);

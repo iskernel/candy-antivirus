@@ -9,10 +9,10 @@ use Test::More;
 
 use IsKernel::CandyAntivirus::Configuration;
 
-use constant DEFAULT_VIRUS_SIGNATURES_PATH => "xvirsig.log";
-use constant DEFAULT_QUARANTINE_PATH => "./Test_Quarantine";
+use constant DEFAULT_VIRUS_SIGNATURES_PATH => "test_xvirsig.cfg";
+use constant DEFAULT_QUARANTINE_PATH => "./TestQuarantine";
 use constant DEFAULT_WORKING_DIRECTORY_PATH => ".";
-use constant DEFAULT_PATH_TO_LOG => "log.cfg";
+use constant DEFAULT_PATH_TO_LOG => "test_log";
 use constant DEFAULT_PATH_TO_QUARANTINE_LOG => "test_qlog.cfg";
 use constant DEFAULT_EXTENSIONS => "all";
 use constant DEFAULT_VIRUS_DETECTED_OPTION => "AskUser";
@@ -20,9 +20,9 @@ use constant DEFAULT_LINK_TO_WWW_DATABASE => "http:://viruscleanerdatabase.com/s
 
 use constant DEFAULT_NEW_VALUE => "default_new_value";
 
-copy("default_test_config.cfg","test_config.cfg") or die "Copy failed: $!";
+copy("../../TestFiles/default_test_config.cfg","../../TestFiles/test_config.cfg") or die "Copy failed: $!";
 
-my $configuration = IsKernel::CandyAntivirus::Configuration->new("test_config.cfg");
+my $configuration = IsKernel::CandyAntivirus::Configuration->new("../../TestFiles/test_config.cfg");
 
 ok($configuration->get_default_working_directory_path() eq DEFAULT_WORKING_DIRECTORY_PATH, 
    "Configuration_GetDefaultWorkingDirectory_InitialConfiguration_IsRead");
