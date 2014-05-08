@@ -6,3 +6,4 @@ sudo apt-get install cpan
 
 sudo cpan LWP::Simple
 sudo cpan Test::More
+sudo cpan PadWalker

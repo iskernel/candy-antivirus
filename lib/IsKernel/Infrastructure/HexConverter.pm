@@ -17,7 +17,7 @@ Type:
 sub new
 {
 	(my $class) = @_;
-	my $self->{"Name"} = "HexConverter";
+	my $self = {};
 	bless $self, $class;
 	return $self;
 }
