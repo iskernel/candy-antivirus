@@ -24,4 +24,5 @@ sub hex_dump_to_ascii_normal_conversion_result_is_correct()
 
 ascii_to_hex_dump_normal_conversion_result_is_correct();
 hex_dump_to_ascii_normal_conversion_result_is_correct();
+
 done_testing();

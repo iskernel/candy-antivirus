@@ -10,7 +10,6 @@ use File::Spec::Functions;
 use LWP::Simple;
 
 use IsKernel::Infrastructure::FileHelper;
-use IsKernel::Infrastructure::HexConverter;
 use IsKernel::Infrastructure::StringHelper;
 use IsKernel::CandyAntivirus::Configuration;
 use IsKernel::CandyAntivirus::VirusScanner;
@@ -21,7 +20,7 @@ use constant ALL_EXTENSIONS => "all";
 
 =pod
 Description:
-	Generates a new Antivirus Engine object
+	Generates a new antivirus engine object
 Parameters:
 	configuration - an Configuration object
 	directory - the working directory
@@ -34,24 +33,35 @@ sub new
 {
 	(my $class, my $configuration, my $directory) = @_;
 	my $self = {};
+	
 	$self->{"Configuration"} = $configuration;
-	$self->{"HexDumper"} =  IsKernel::CandyAntivirus::Infrastructure::HexConverter->new();
-	$self->{"Scanner"} = IsKernel::CandyAntivirus::VirusScanner->new($configuration->getVirusDatabasePath());
-	$self->{"EventLogger"} = IsKernel::CandyAntivirus::Infrastructure::FileLogger->new($configuration->getPathToLog());
-	$self->{"QuarantineLogger"} = IsKernel::CandyAntivirus::Infrastructure::FileLogger->new($configuration->getPathToQuarantineLog());
-	$self->{"RandomFilenameGenerator"} = IsKernel::CandyAntivirus::Infrastructure::RandomStringGenerator->new(RANDOM_FILENAME_LENGTH);
-	#If no directory is specified, than the default directory from configuration will be used
-	if( (defined $directory) && (-d $directory) )
-	{
-		$self->{"Directory"} = $directory;
-	}
-	else
-	{
-		$self->{"Directory"} = $configuration->getDefaultWorkingDirectory();
-	}
+	$self->{"Scanner"} = IsKernel::CandyAntivirus::VirusScanner->new($configuration->get_virus_database_path());
+	#$self->{"HexConverter"} = IsKernel::Infrastructure::HexConverter->new();
+	$self->{"EventLogger"} = IsKernel::CandyAntivirus::FileHelper->new($configuration->get_path_to_log());
+	$self->{"QuarantineLogger"} = IsKernel::CandyAntivirus::FileHelper->new($configuration->get_path_to_quarantine_log());
+	#$self->{"RandomFilenameGenerator"} = IsKernel::CandyAntivirus::StringHelper->new(RANDOM_FILENAME_LENGTH);
+	$self->set_working_directory($directory);	
 	bless $self, $class;
 	return $self;
 }
+
+=pod
+Description:
+	Returns the hex converter
+Parameters:
+	None
+Returns:
+	The hex converter
+Type:
+	Constructor
+
+sub get_hex_converter()
+{
+	my $self = shift;
+	return $self->{"HexConverter"};
+}
+=cut
+
 =pod
 Description:
 	Changes the configuration object
@@ -62,7 +72,7 @@ Returns:
 Type:
 	Private
 =cut
-sub setConfiguration_
+sub set_configuration()
 {
 	my $self = shift;
 	$self->{"Configuration"} = shift;
@@ -77,10 +87,27 @@ Returns:
 Type:
 	Private
 =cut
-sub setWorkingDirectory
+sub set_working_directory()
 {
 	my $self = shift;
-	$self->{"Directory"} = shift;
+	my $directory = shift;
+	my $response = undef;
+	if( defined $directory )
+	{
+		if(-d $directory)
+		{
+			$self->{"Directory"} = $directory;
+			$response = IsKernel::CandyAntivirus::EngineResponse->new("Directory set");
+		}
+		else
+		{
+			$self->{"Directory"} = $self->get_configuration()->get_default_working_directory();			
+		}
+	}
+	else
+	{		
+		$self->{"Directory"} = $self->get_configuration()->get_default_working_directory();
+	}
 }
 =pod
 Description:
@@ -92,11 +119,12 @@ Returns:
 Type:
 	Private
 =cut
-sub getConfiguration
+sub get_configuration()
 {
 	my $self = shift;
 	return $self->{"Configuration"};
 }
+
 =pod
 Description:
 	Returns the working directory used by the Engine
@@ -107,26 +135,12 @@ Returns:
 Type:
 	Private
 =cut
-sub getWorkingDirectory
+sub get_working_directory()
 {
 	my $self = shift;
 	return $self->{"Directory"};
 }
-=pod
-Description:
-	Returns the hex dumper used by the Engine
-Parameters:
-	None
-Returns:
-	The hex dumper used by the engine
-Type:
-	Private
-=cut
-sub getHexDumper
-{
-	my $self = shift;
-	return $self->{"HexDumper"};
-}
+
 =pod
 Description:
 	Returns the virus scanner used by the Engine
@@ -137,11 +151,12 @@ Returns:
 Type:
 	Private
 =cut
-sub getScanner
+sub get_scanner()
 {
 	my $self = shift;
 	return $self->{"Scanner"};
 }
+
 =pod
 Description:
 	Returns the event logger used by the Engine
@@ -152,11 +167,12 @@ Returns:
 Type:
 	Private
 =cut
-sub getEventLogger
+sub get_event_logger()
 {
 	my $self = shift;
 	return $self->{"EventLogger"};
 }
+
 =pod
 Description:
 	Returns the quarantine logger used by the Engine
@@ -167,11 +183,12 @@ Returns:
 Type:
 	Private
 =cut
-sub getQuarantineLogger()
+sub get_quarantine_logger()
 {
 	my $self = shift;
 	return $self->{"QuarantineLogger"};
 }
+
 =pod
 Description:
 	Returns the random filename generator used by the Engine
@@ -182,45 +199,12 @@ Returns:
 Type:
 	Private
 =cut
-sub getRandomFilenameGenerator()
+sub get_random_filename_generator()
 {
 	my $self = shift;
 	return $self->{"RandomFilenameGenerator"};
 }
-=pod
-Description:
-	Verifies if a file is scannable
-Parameters:
-	path - the path to the file
-Returns:
-	-1 - Error
-	1 - the file is ordinary, writable and readable
-	0 - the file is ordinary, but is not writable or not readable
-	2 - the file is not ordinary
-Type:
-	Public
-=cut
-sub verifyFile
-{
-	(my $self, my $path) = @_;
-	my $result = -1;
-	if( (-f $path) )
-	{
-		if( (-w $path) && (-r $path) )
-		{
-			$result = 1;
-		}
-		else
-		{
-			$result = 0;
-		}
-	}
-	else
-	{
-		$result = 2;
-	}
-	return $result;
-}
+
 =pod
 Description:
 	Verifies if a file has a virus.
@@ -234,14 +218,14 @@ Returns:
 Type:
 	Public
 =cut
-sub hasVirus
+sub has_virus()
 {
-	(my $self, my $fileManager) = @_;
-	my $content = $fileManager->getContentAsString();
-	my $hexDump = $self->getHexDumper()->convertAsciiToHexDump($content);
-	(my $hasVirus, my $virusName) = $self->getScanner()->analyzeHexDump($hexDump);
+	(my $self, my $file_helper) = @_;
+	my $content = $file_helper->get_content_as_string();
+	(my $hasVirus, my $virusName) = $self->getScanner()->analyze_content($content);
 	return ($hasVirus, $virusName);
 }
+
 =pod
 Description:
 	Deletes a file
@@ -255,34 +239,35 @@ Returns:
 Type:
 	Public
 =cut
-sub deleteAction
+sub delete_action
 {
-	(my $self, my $fileManager) = @_;
-	my $result = unlink($fileManager->getPath());
+	(my $self, my $file_manager) = @_;
+	my $result = unlink($file_manager->getPath());
 	
-	my $nowTime = localtime;
+	my $now_time = localtime;
 	
-	my $printResponse = undef;
-	my $logResponse = undef;
-	my $retVal = undef;
+	my $print_response = undef;
+	my $log_response = undef;
+	my $ret_val = undef;
 	#The file was deleted successfully
 	if($result)
 	{
-		$printResponse = $fileManager->getPath()." "."was deleted from system\n";
-		$logResponse = $nowTime." ".$printResponse;
-		$retVal = 1;
+		$print_response = $file_manager->get_path()." "."was deleted from system\n";
+		$log_response = $now_time." ".$print_response;
+		$ret_val = 1;
 	}
 	#The file was not deleted successfully
 	else
 	{
-		$printResponse = $fileManager->getPath()." "."was NOT deleted from system\n";
-		$logResponse = $nowTime." ".$printResponse;
-		$retVal = 0;
+		$print_response = $file_manager->get_path()." "."was NOT deleted from system\n";
+		$log_response = $now_time." ".$print_response;
+		$ret_val = 0;
 	}
 	#Writes to log file
-	$self->getEventLogger()->appendString($logResponse);
-	return ($retVal, $printResponse);
+	$self->get_event_logger()->append_to_file($log_response);
+	return ($ret_val, $print_response);
 }
+
 =pod
 Description:
 	Quarantines a file
@@ -296,60 +281,49 @@ Returns:
 Type:
 	Public
 =cut
-sub quarantineAction
+sub quarantine_action
 {
-	(my $self, my $fileManager) = @_;
+	(my $self, my $file_manager) = @_;
+	
 	#Puts in memory the content of the original file
-	my $fileContent = $fileManager->getContentAsString();
+	my $file_content = $file_manager->get_content_as_string();
 	
 	#Deletes the original file
-	my $result = unlink($fileManager->getPath());
+	my $result = unlink($file_manager->get_path());
 	
-	my $nowTime = localtime;
-	my $oldPath = $fileManager->getPath();
-	print $oldPath;
+	my $now_time = localtime;
+	my $old_path = $file_manager->get_path();
 	
-	my $logResponse = undef;
-	my $printResponse = undef;
-	my $retVal = 0;
+	my $log_response = undef;
+	my $print_response = undef;
+	my $ret_val = 0;
 	
 	if($result)
 	{
-		#Dumps file to hex
-		my $fileHexDump = $self->getHexDumper()->convertAsciiToHexDump($fileContent);
-		my $filenameGuard = 1;
-		my $filename = undef;
-		my $newPath = undef;
-		#Generates a valid (which doesn't already exist) random filename for the hexdump.
-		while($filenameGuard==1)
-		{
-			$filename = $self->getRandomFilenameGenerator()->generate();
-			$newPath = catfile($self->getConfiguration->getQuarantinePath(), $filename);
-			if(!-e $newPath)
-			{
-				$filenameGuard = 0;
-			}
-		}
-		#Creates the hexdump
-		my $hexFileManager = Com::IsKernel::Libs::FileHandling::FileManager->new($newPath, $fileHexDump);
-		#Creates the file
-		$hexFileManager->createFile();
-		#Adds definition to the quarantine logger in case the user wants to restore the file
-		$self->getQuarantineLogger->appendString($oldPath."=".$newPath."\n");
-		$printResponse = $oldPath." was quarantined from system\n";
-		$logResponse = $nowTime." ".$printResponse;
-		$retVal = 1;
+		#Creates the hexdump file
+		my $hex_file_manager = IsKernel::Infrastructure::FileHelper->new(".");
+		my $new_path = $hex_file_manager->create_random_filename();
+		$hex_file_manager->set_path($new_path);
+		#Writes the hexdump
+		my $hex_dump_content = $self->get_hex_converter()->ascii_to_hex_dump($file_content);		
+		$hex_file_manager->write_to_file($hex_dump_content);
+		#Adds a definition to the quarantine logger in case the user wants to restore the file
+		my $log_message = $old_path."=".$new_path."\n";
+		$self->get_quarantine_logger()->append_to_file($log_message);
+		$print_response = $old_path." was quarantined from system\n";
+		$log_response = $now_time." ".$print_response;
+		$ret_val = 1;
 	}
 	else
 	{
-		$printResponse = $oldPath." was NOT quarantined successfully\n";
-		$logResponse = $nowTime." ".$printResponse;
+		$print_response = $old_path." was NOT quarantined successfully\n";
+		$log_response = $now_time." ".$print_response;
 		
 	}
 	#Writes event to event logger
-	$self->getEventLogger()->appendString($logResponse);
+	$self->get_event_logger()->append_to_file($log_response);
 	
-	return ($retVal, $printResponse);
+	return ($ret_val, $print_response);
 }
 =pod
 Description:
@@ -364,25 +338,25 @@ Returns:
 Type:
 	Public
 =cut
-sub disinfectAction
+sub disinfect_action()
 {
-	(my $self, my $fileManager) = @_;
-	my $fileContent = $fileManager->getContentAsString();
+	(my $self, my $file_manager) = @_;
+	my $file_content = $file_manager->get_content_as_string();
 	#Dumps the content of the file to hex
-	my $fileHexDump = $self->getHexDumper()->convertAsciiToHexDump($fileContent);
+	my $file_hex_dump = $self->get_hex_converter()->ascii_to_hex_dump($file_content);
 	#Removes all virus signatures
-	$fileHexDump = $self->getScanner()->disinfectHexDump($fileHexDump);
+	$file_hex_dump = $self->get_scanner()->disinfect_content($file_hex_dump);
 	#Converts the newly created hex to ASCII
-	$fileContent = $self->getHexDumper()->convertHexDumpToAscii($fileHexDump);
+	$file_content = $self->get_hex_converter()->hex_dump_to_ascii($file_hex_dump);
 	#Replaces the content in the original file
-	$fileManager->replaceContent($fileContent);
+	$file_manager->write_to_file($file_content);
 	
-	my $nowTime = localtime;
-	my $printResponse = $fileManager->getPath()." "."was disinfected successfully\n";
-	my $logResponse = $nowTime." ".$printResponse;
-	$self->getEventLogger()->appendString($logResponse);
+	my $now_time = localtime;
+	my $print_response = $file_manager->get_path()." "."was disinfected successfully\n";
+	my $log_response = $now_time." ".$print_response;
+	$self->getEventLogger()->appendString($log_response);
 	
-	return (1,$printResponse);	
+	return (1,$print_response);	
 }
 =pod
 Description:
@@ -394,10 +368,10 @@ Returns:
 Type:
 	Public
 =cut
-sub getLogFileContents
+sub get_log_file_content()
 {
 	my $self = shift;
-	return $self->getEventLogger()->getContentAsString();
+	return $self->get_event_logger()->get_content_as_string();
 }
 =pod
 Description:
@@ -410,13 +384,15 @@ Returns:
 Type:
 	Public
 =cut
-sub downloadNewDefinitions
+sub download_new_definitions()
 {
 	my $self = shift;
-	my $content = get($self->getConfiguration()->getPathToWwwDatabase()) 
+	my $content = get($self->get_configuration()->get_path_to_www_database()) 
 				  or die("Could not get content from online database");
-	my $fileManager = Com::IsKernel::Libs::FileHandling::FileManager->new($self->getConfiguration()->getVirusDatabasePath());
-	$fileManager->replaceContent($content);
+    open(my $handle, ">", $self->get_configuration()->get_virus_database_path()) 
+    	 or die("Could not create file at ".$self->get_configuration()->get_virus_database_path());
+	print $handle $content;
+	close($handle);
 }
 =pod
 Description:
@@ -428,18 +404,18 @@ Returns:
 Type:
 	Public
 =cut
-sub getQuarantinedFiles
+sub get_quarantined_files()
 {
 	my $self = shift;
-	my $fileManager = Com::IsKernel::Libs::FileHandling::FileManager->new($self->getConfiguration()->getPathToQuarantineLog());
-	my @lines = $fileManager->getContentAsArray();
+	my $file_manager = IsKernel::Infrastructure::FileHelper->new($self->get_configuration()->get_path_to_quarantine_log());
+	my @lines = $file_manager->get_content_as_array();
 	my @files;
 	my $index = 0;
 	foreach my $line (@lines)
 	{
-		(my $oldPath, my $newPath) = split("=",$line);
-		chomp($oldPath);
-		$files[$index] = $oldPath;
+		(my $old_path, my $new_path) = split("=",$line);
+		chomp($old_path);
+		$files[$index] = $old_path;
 		$index++;
 	}
 	return @files;
@@ -454,48 +430,45 @@ Returns:
 Type:
 	Public
 =cut
-sub restoreQuarantinedFile
+sub restore_quarantined_file()
 {
 	my $self = shift;
 	my $path = shift;
-	my $quarantineManager = Com::IsKernel::Libs::FileHandling::FileManager->new(
-										   $self->getConfiguration()->getPathToQuarantineLog());
-	my @lines = $quarantineManager->getContentAsArray();
+	my $quarantine_manager = IsKernel::Infrastructure::FileHelper->new($self->get_configuration()->get_path_to_quarantine_log());
+	my @lines = $quarantine_manager->get_content_as_array();
 	my @files;
 	my $index = 0;
 	#Searches for the file
 	foreach my $line (@lines)
 	{
-		(my $oldPath, my $newPath) = split("=",$line);
-		chomp($oldPath);
-		chomp($newPath);
-		if($path eq $oldPath)
+		(my $old_path, my $new_path) = split("=",$line);
+		chomp($old_path);
+		chomp($new_path);
+		if($path eq $old_path)
 		{
 			#The file was found
-			my $newFileManager = Com::IsKernel::Libs::FileHandling::FileManager->new($newPath);
+			my $new_file_manager = IsKernel::Infrastructure::FileHelper->new($new_path);
 			#Converts the hexdump to ASCII
-			my $content = $self->getHexDumper()->convertHexDumpToAscii(
-								$newFileManager->getContentAsString());
+			my $content = $self->get_hex_converter()->hex_dump_to_ascii($new_file_manager->get_content_as_string());
 			#Restores the file
-			$newFileManager->setPath($oldPath);
-			$newFileManager->createFile();
-			$newFileManager->replaceContent($content);
-			my $response = unlink($newPath);
+			$new_file_manager->set_path($old_path);
+			$new_file_manager->write_to_file($content);
+			my $response = unlink($new_path);
 			my $result = 0;
 			if($response)
 			{
 				#If restoration was successful, removes the coresponding line from the quarantine log
-				my $quarantineContent = $quarantineManager->getContentAsString();
-				$quarantineContent =~ s/\Q$line//g;
-				$quarantineManager->replaceContent($quarantineContent);
+				my $quarantine_content = $quarantine_manager->get_content_as_string();
+				$quarantine_content =~ s/\Q$line//g;
+				$quarantine_manager->write_to_file($quarantine_content);
 				$result = 1;
 			}
-			my $nowTime = localtime;
-			my $printResponse = $newFileManager->getPath()." "."was restored successfully\n";
-			my $logResponse = $nowTime." ".$printResponse;
-			$self->getEventLogger()->appendString($logResponse);
+			my $now_time = localtime;
+			my $print_response = $new_file_manager->get_path()." "."was restored successfully\n";
+			my $log_response = $now_time." ".$print_response;
+			$self->get_event_logger()->append_to_file($log_response);
 	
-			return ($result,$printResponse);
+			return ($result,$print_response);
 		}
 	}
 		
@@ -510,11 +483,11 @@ Returns:
 Type:
 	Public
 =cut
-sub changeScanExtensions
+sub set_scan_extensions
 {
 	my $self= shift;
-	my $newExtensions = shift;
-	$self->getConfiguration()->setExtensions($newExtensions);
+	my $new_extensions = shift;
+	$self->get_configuration()->set_extensions($new_extensions);
 }
 =pod
 Description:
@@ -527,20 +500,20 @@ Returns:
 Type:
 	Public
 =cut
-sub verifyExtension
+sub verify_extension()
 {
 	my $self = shift;
 	my $path = shift;
 	my $result = 0;
-	my $extensionString = $self->getConfiguration()->getExtensions();
-	if($extensionString eq ALL_EXTENSIONS)
+	my $extension_content = $self->get_configuration()->get_extensions();
+	if($extension_content eq ALL_EXTENSIONS)
 	{
 		$result = 1;
 	}
 	else
 	{
 		my $ext = ($path =~ m/([^.]+)$/)[0];
-		my @extensions = split(" ",$extensionString);
+		my @extensions = split(" ",$extension_content);
 		foreach my $extension (@extensions)
 		{
 			if($extension eq $ext)
