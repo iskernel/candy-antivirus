@@ -9,14 +9,14 @@ use Test::More;
 
 use IsKernel::CandyAntivirus::Configuration;
 
-use constant DEFAULT_VIRUS_SIGNATURES_PATH => "test_xvirsig.cfg";
-use constant DEFAULT_QUARANTINE_PATH => "./TestQuarantine";
-use constant DEFAULT_WORKING_DIRECTORY_PATH => ".";
-use constant DEFAULT_PATH_TO_LOG => "test_log";
-use constant DEFAULT_PATH_TO_QUARANTINE_LOG => "test_qlog.cfg";
+use constant DEFAULT_VIRUS_SIGNATURES_PATH => "../../TestFiles/test_xvirsig.cfg";
+use constant DEFAULT_QUARANTINE_PATH => "../../TestFiles/TestQuarantine/";
+use constant DEFAULT_WORKING_DIRECTORY_PATH => "../../TestFiles/";
+use constant DEFAULT_PATH_TO_LOG => "../../TestFiles/test_log";
+use constant DEFAULT_PATH_TO_QUARANTINE_LOG => "../../TestFiles/test_qlog";
 use constant DEFAULT_EXTENSIONS => "all";
 use constant DEFAULT_VIRUS_DETECTED_OPTION => "AskUser";
-use constant DEFAULT_LINK_TO_WWW_DATABASE => "http:://viruscleanerdatabase.com/signatures";
+use constant DEFAULT_LINK_TO_WWW_DATABASE => "http://www.nlnetlabs.nl/downloads/antivirus/antivirus/virussignatures.strings";
 
 use constant DEFAULT_NEW_VALUE => "default_new_value";
 

@@ -34,7 +34,7 @@ Parameters:
 Returns
 	The hex converter object
 =cut
-sub _get_hex_converter()
+sub _get_hex_converter
 {
 	my $self = shift;
 	return $self->{"hexConverter"};

@@ -133,7 +133,7 @@ Returns:
 Type:
 	Public
 =cut
-sub delete_file()
+sub delete_file
 {
 	(my $self) = @_;
 	unlink $self->get_path();

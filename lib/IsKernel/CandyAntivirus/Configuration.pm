@@ -39,7 +39,7 @@ Parameters:
 Returns
 	None
 =cut
-sub load()
+sub load
 {
 	my $self = shift;
 	open(my $handle, 
@@ -94,7 +94,7 @@ Parameters:
 Returns
 	The path to the online virus database
 =cut
-sub get_path_to_www_database()
+sub get_path_to_www_database
 {
 	my $self = shift;
 	return $self->{"linkToWwwDatabase"};
@@ -108,7 +108,7 @@ Parameters:
 Returns
 	The path to the quarantine log
 =cut
-sub get_path_to_quarantine_log()
+sub get_path_to_quarantine_log
 {
 	(my $self) = @_;
 	return $self->{"pathToQuarantineLog"};
@@ -122,7 +122,7 @@ Parameters:
 Returns
 	The path to the event log
 =cut
-sub get_path_to_log()
+sub get_path_to_log
 {
 	(my $self) = @_;
 	return $self->{"pathToLog"};
@@ -136,7 +136,7 @@ Parameters:
 Returns
 	The path to the offline virus database
 =cut
-sub get_virus_database_path()
+sub get_virus_database_path
 {
 	(my $self) = @_;
 	return $self->{"virusDatabasePath"};
@@ -150,7 +150,7 @@ Parameters:
 Returns
 	The path to the quarantine directory
 =cut
-sub get_quarantine_path()
+sub get_quarantine_path
 {
 	(my $self) = @_;
 	return $self->{"quarantinePath"};
@@ -164,7 +164,7 @@ Parameters:
 Returns
 	The path to the default working directory
 =cut
-sub get_default_working_directory_path()
+sub get_default_working_directory_path
 {
 	(my $self) = @_;
 	return $self->{"defaultWorkingDirectory"} ;
@@ -178,7 +178,7 @@ Parameters:
 Returns
 	The scannable file extensions
 =cut
-sub get_extensions_option()
+sub get_extensions_option
 {
 	(my $self) = @_;
 	return $self->{"extensions"} ;
@@ -192,7 +192,7 @@ Parameters:
 Returns
 	The default user action in case of virus detection
 =cut
-sub get_virus_detected_option()
+sub get_virus_detected_option
 {
 	(my $self) = @_;
 	return $self->{"virusDetectedOption"};
@@ -206,7 +206,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_path_to_quarantine_log()
+sub set_path_to_quarantine_log
 {
 	(my $self, my $newValue) = @_;
 	$self->{"pathToQuarantineLog"} = $newValue;
@@ -220,7 +220,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_virus_database_path()
+sub set_virus_database_path
 {
 	(my $self, my $path) = @_;
 	$self->{"virusDatabasePath"} = $path;
@@ -234,7 +234,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_quarantine_path()
+sub set_quarantine_path
 {
 	(my $self, my $path) = @_;
 	$self->{"quarantinePath"} = $path;
@@ -248,7 +248,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_default_working_drectory()
+sub set_default_working_drectory
 {
 	(my $self, my $path) = @_;
 	$self->{"defaultWorkingDirectory"} = $path;
@@ -262,7 +262,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_extension_option()
+sub set_extension_option
 {
 	(my $self, my $path) = @_;
 	$self->{"extensions"} = $path;
@@ -276,7 +276,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_virus_detected_option()
+sub set_virus_detected_option
 {
 	(my $self, my $path) = @_;
 	$self->{"virusDetectedOption"} = $path;
@@ -290,7 +290,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_path_to_log()
+sub set_path_to_log
 {
 	(my $self, my $path) = @_;
 	$self->{"pathToLog"} = $path;
@@ -304,7 +304,7 @@ Parameters:
 Returns
 	None
 =cut
-sub set_path_to_www_database()
+sub set_path_to_www_database
 {
 	my $self = shift;
 	$self->{"linkToWwwDatabase"} = shift;
@@ -318,7 +318,7 @@ Parameters:
 Returns
 	None
 =cut
-sub save_settings()
+sub save_settings
 {
 	(my $self) = @_;
 	my $content = 

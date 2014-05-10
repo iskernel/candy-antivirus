@@ -33,7 +33,7 @@ Parameters:
 Returns:
 	The response in print form
 =cut
-sub get_print_response()
+sub get_print_response
 {
 	my $self = shift;
 	return $self->{"PrintResponse"};
@@ -47,7 +47,7 @@ Parameters:
 Returns:
 	The response in log form
 =cut
-sub get_log_response()
+sub get_log_response
 {
 	my $self = shift;
 	return $self->{"LogResponse"};
@@ -61,7 +61,7 @@ Parameters:
 Returns:
 	An code representing the status of the engine response
 =cut
-sub get_status()
+sub get_status
 {
 	my $self = shift;
 	return $self->{"Status"};

@@ -32,7 +32,7 @@ Returns
 	1 - the file has a virus
 	0 - the file does not have a virus
 =cut
-sub has_virus()
+sub has_virus
 {
 	my $self = shift;
 	return $self->{"HasVirus"};
@@ -46,7 +46,7 @@ Parameters
 Returns
 	The name of the virus
 =cut
-sub virus_name()
+sub virus_name
 {
 	my $self = shift;
 	return $self->{"VirusName"};

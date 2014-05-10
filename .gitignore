@@ -16,6 +16,7 @@ Build.bat
 nytprof.out
 /pm_to_blib
 /.metadata
+/test/TestFiles/TestQuarantine/
 *.o
 *.bs
 *.*~

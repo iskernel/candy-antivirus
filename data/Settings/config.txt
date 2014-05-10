@@ -1,8 +1,0 @@
-VIRUS_SIGNATURES_PATH=/home/bogdan/Dropbox/IsKernel/Perl/VirusScanner/Antivirus/Com/IsKernel/Apps/Antivirus/Settings/xvirsig.log
-QUARANTINE_PATH=/home/bogdan/Dropbox/IsKernel/Perl/VirusScanner/Antivirus/Com/IsKernel/Apps/Antivirus/Quarantine
-DEFAULT_WORKING_DIRECTORY_PATH=/home/bogdan/Dropbox/IsKernel/Perl/VirusScanner/Antivirus/Com/IsKernel/Apps/Antivirus/TestEnvironment
-PATH_TO_LOG=/home/bogdan/Dropbox/IsKernel/Perl/VirusScanner/Antivirus/Com/IsKernel/Apps/Antivirus/Settings/log.txt
-PATH_TO_QUARANTINE_LOG=/home/bogdan/Dropbox/IsKernel/Perl/VirusScanner/Antivirus/Com/IsKernel/Apps/Antivirus/Quarantine/qlog.txt
-EXTENSIONS=all
-VIRUS_DETECTED_OPTION=AskUser
-LINK_TO_WWW_DATABASE=http://dystopian-code.googlecode.com/files/xvirsig.log

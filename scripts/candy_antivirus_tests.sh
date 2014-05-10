@@ -20,3 +20,4 @@ perl EngineResponseTests.pl
 perl ScanResponseTests.pl
 perl VirusScannerTests.pl 
 perl EngineTests.pl
+perl EventLoggerTests.pl

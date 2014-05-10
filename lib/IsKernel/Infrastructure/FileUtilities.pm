@@ -34,7 +34,7 @@ Returns:
 	0 - the file is ordinary, but is not writable or not readable
 	2 - the file is not ordinary
 =cut
-sub is_ordinary_file()
+sub is_ordinary_file
 {
 	(my $self, my $path) = @_;
 	my $result = -1;
@@ -65,7 +65,7 @@ Parameters:
 Returns:
 	An unique filename for the specified directory
 =cut
-sub create_random_filename()
+sub create_random_filename
 {
 	my $self = shift;
 	my $length = shift;
@@ -78,7 +78,7 @@ sub create_random_filename()
 	my $new_path = undef;
 	while($filename_guard==1)
 	{
-		$filename = $generator->generate_random();
+		$filename = $generator->generate_random($length);
 		$new_path = catfile($directory_path, $filename);
 		if(!-e $new_path)
 		{
@@ -86,7 +86,7 @@ sub create_random_filename()
 		}
 	}
 	
-	return $filename;
+	return $new_path;
 }
 
 1;
