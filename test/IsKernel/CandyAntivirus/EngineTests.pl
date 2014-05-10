@@ -9,6 +9,7 @@ use Test::More;
 
 use IsKernel::CandyAntivirus::Configuration;
 use IsKernel::CandyAntivirus::Engine;
+use IsKernel::CandyAntivirus::EngineResponse;
 
 use constant DEFAULT_CONFIG_DIRECTORY => ".";
 use constant DEFAULT_DIRECTORY => "../../TestFiles/ToScanFiles";
@@ -18,6 +19,7 @@ use constant DEFAULT_TEST_CONFIG => "../../TestFiles/default_test_config.cfg";
 use constant DEFAULT_CONFIG => "../../TestFiles/test_config.cfg";
 use constant DEFAULT_TEST_FILE => "../../TestFiles/ToScanFiles/file1.txt";
 use constant DEFAULT_COPY_TEST_FILE => "../../TestFiles/ToScanFiles/copyfile1.txt";
+use constant DEFAULT_TO_DELETE_TEST_DIRECTORY => "../../TestFiles/ToScanFiles/MyDir";
 
 
 sub setup()
@@ -52,18 +54,24 @@ sub action_delete_delete_a_valid_file_file_is_deleted()
 {
 	copy(DEFAULT_TEST_FILE, DEFAULT_COPY_TEST_FILE) or die "Copy failed: $!";	
 	my $engine = setup();
-	ok($engine->action_delete(DEFAULT_COPY_TEST_FILE).get_status()==1, "Engine_ActionDelete_AValidFile_FileIsDeleted");
+	ok($engine->action_delete(DEFAULT_COPY_TEST_FILE)->get_status() == 1, "Engine_ActionDelete_AValidFile_FileIsDeleted");
+	unlink(DEFAULT_COPY_TEST_FILE);
 }
 
 sub action_delete_delete_a_directory_directory_is_not_deleted()
 {
-	copy(DEFAULT_TEST_FILE, DEFAULT_COPY_TEST_FILE) or die "Copy failed: $!";	
+	mkdir(DEFAULT_TO_DELETE_TEST_DIRECTORY);
 	my $engine = setup();
-	ok($engine->action_delete(DEFAULT_COPY_TEST_FILE).get_status()==1, "Engine_ActionDelete_AValidFile_FileIsDeleted");
+	ok($engine->action_delete(DEFAULT_COPY_TEST_FILE)->get_status() == 0, "Engine_ActionDelete_ADirectory_DirectoryIsDeleted");
+	rmdir(DEFAULT_TO_DELETE_TEST_DIRECTORY);
 }
+
+
 
 get_working_directory_default_configuration_get_as_expected();
 set_working_directory_to_new_valid_path_new_path_is_set();
 set_working_directory_to_new_invalid_path_new_path_is_set();
 action_delete_delete_a_valid_file_file_is_deleted();
+action_delete_delete_a_directory_directory_is_not_deleted();
+
 done_testing();

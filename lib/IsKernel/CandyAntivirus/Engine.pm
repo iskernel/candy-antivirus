@@ -21,14 +21,12 @@ use constant ALL_EXTENSIONS => "all";
 
 =pod
 Description:
-	Generates a new antivirus engine object
+	Generates a new object
 Parameters:
-	configuration - an Configuration object
-	directory - the working directory
+	configuration - a configuration object
+	directory - the path to working directory
 Returns:
 	A reference to the new object
-Type:
-	Constructor
 =cut
 sub new
 {
@@ -50,10 +48,8 @@ Parameters:
 	configuration - the new configuration object
 Returns:
 	None
-Type:
-	Private
 =cut
-sub set_configuration()
+sub _set_configuration()
 {
 	my $self = shift;
 	$self->{"Configuration"} = shift;
@@ -66,8 +62,6 @@ Parameters:
 	path - the path to the new working directory
 Returns:
 	None
-Type:
-	Private
 =cut
 sub set_working_directory()
 {
@@ -94,13 +88,11 @@ sub set_working_directory()
 }
 =pod
 Description:
-	Returns the Configuration object used by the Engine
+	Returns the configuration object used by the engine
 Parameters:
 	None
 Returns:
 	The configuration object used by the engine
-Type:
-	Private
 =cut
 sub get_configuration()
 {
@@ -110,13 +102,11 @@ sub get_configuration()
 
 =pod
 Description:
-	Returns the working directory used by the Engine
+	Returns the working directory used by the engine
 Parameters:
 	None
 Returns:
 	The working directory used by the engine
-Type:
-	Private
 =cut
 sub get_working_directory()
 {
@@ -126,13 +116,11 @@ sub get_working_directory()
 
 =pod
 Description:
-	Returns the virus scanner used by the Engine
+	Returns the virus scanner 
 Parameters:
 	None
 Returns:
-	The virus scanner used by the engine
-Type:
-	Private
+	The virus scanner
 =cut
 sub get_scanner()
 {
@@ -142,13 +130,11 @@ sub get_scanner()
 
 =pod
 Description:
-	Returns the event logger used by the Engine
+	Returns the event logger
 Parameters:
 	None
 Returns:
-	The event logger used by the engine
-Type:
-	Private
+	The event logger
 =cut
 sub get_event_logger()
 {
@@ -158,13 +144,11 @@ sub get_event_logger()
 
 =pod
 Description:
-	Returns the quarantine logger used by the Engine
+	Returns the quarantine logger
 Parameters:
 	None
 Returns:
-	The quarantine logger used by the engine
-Type:
-	Private
+	The quarantine logger
 =cut
 sub get_quarantine_logger()
 {
@@ -213,13 +197,13 @@ sub action_delete()
 	if($result)
 	{		
 		my $to_print = $path." "."was deleted from system\n";
-		$response = IsKernel::Infrastructure::EngineResponse->new($to_print, 1);		
+		$response = IsKernel::CandyAntivirus::EngineResponse->new($to_print, 1);		
 	}
 	#The file was not deleted successfully
 	else
 	{
 		my $to_print = $path." "."was NOT deleted from system\n";
-		$response = IsKernel::Infrastructure::EngineResponse->new($to_print, 0);
+		$response = IsKernel::CandyAntivirus::EngineResponse->new($to_print, 0);
 	}
 	#Writes to log file
 	$self->get_event_logger()->append_to_file($response->get_log_response());
@@ -287,34 +271,25 @@ sub action_quarantine()
 Description:
 	Disinfects a file
 Parameters:
-	fileManager - a FileManager object containing the path to the scanned file
+	path - the path to the scanned file
 Returns:
-	(retVal, printResponse)
-	retVal = 1 => The file was disinfected successfully
-	retVal = 0 => The file was not disinfected
-	printResponse - a message detailing the result of the operation
+	response - an EngineResponse object
 Type:
 	Public
 =cut
 sub action_disinfect()
 {
-	(my $self, my $file_manager) = @_;
+	(my $self, my $path) = @_;
+	my $file_manager = IsKernel::Infrastructure::FileHelper->new($path);	
 	my $file_content = $file_manager->get_content_as_string();
-	#Dumps the content of the file to hex
-	my $file_hex_dump = $self->get_hex_converter()->ascii_to_hex_dump($file_content);
-	#Removes all virus signatures
-	$file_hex_dump = $self->get_scanner()->disinfect_content($file_hex_dump);
-	#Converts the newly created hex to ASCII
-	$file_content = $self->get_hex_converter()->hex_dump_to_ascii($file_hex_dump);
-	#Replaces the content in the original file
+	$file_content = $self->get_scanner()->disinfect_content($file_content);	
 	$file_manager->write_to_file($file_content);
 	
-	my $now_time = localtime;
-	my $print_response = $file_manager->get_path()." "."was disinfected successfully\n";
-	my $log_response = $now_time." ".$print_response;
-	$self->getEventLogger()->appendString($log_response);
+	my $print_response = $file_manager->get_path()." "."was disinfected successfully\n";	
+	my $response = IsKernel::CandyAntivirus::EngineResponse($print_response, 1);
+	$self->get_event_logger()->appendString($response->get_log_response());
 	
-	return (1,$print_response);	
+	return $response;
 }
 
 =pod

@@ -6,13 +6,11 @@ use v5.14;
 
 =pod
 Description:
-	Creates a new HexConverter object
+	Creates a new object
 Parameters:
 	None
 Returns:
 	A reference to the object
-Type:
-	Constructor
 =cut
 sub new
 {
@@ -29,8 +27,6 @@ Parameters:
 	content - An ASCII string
 Returns:
 	A string containing the hexdump
-Type:
-	Public
 =cut
 sub ascii_to_hex_dump
 {
@@ -41,17 +37,17 @@ sub ascii_to_hex_dump
 	foreach my $char(@chars)
 	{
 		#Gets the ASCII code of the character
-		my $asciiCode = ord($char);
+		my $ascii_code = ord($char);
 		#Gets the hexadecimal code of the character
-		my $hexaCode  = sprintf("%x",$asciiCode);
+		my $hex_code  = sprintf("%x",$ascii_code);
 		#Adds 0 in front of single digit numbers
-		my $length = length($hexaCode);
+		my $length = length($hex_code);
 		if($length==1)
 		{
-			$hexaCode = "0".$hexaCode;
+			$hex_code = "0".$hex_code;
 		}
 		#Adds the number to the string
-		$result[$index] = $hexaCode;
+		$result[$index] = $hex_code;
 		$index++;
 	}
 	my $string = join("",@result);
@@ -64,20 +60,18 @@ Parameters:
 	hexdump - the content of the hexdump
 Returns:
 	An array containing the ASCII string
-Type:
-	Public
 =cut
 sub hex_dump_to_ascii
 {
-	(my $self, my $hexDump) = @_;
-	my @chars = split("", $hexDump);
+	(my $self, my $hex_dump) = @_;
+	my @chars = split("", $hex_dump);
 	my $length = @chars;
 	my $result;
 	for(my $i = 0; $i< ($length - 1); $i+=2)
 	{
-		my $highNibble = hex($chars[$i]);
-		my $lowNibble  = hex($chars[($i+1)]);
-		my $byte = ($highNibble * 16) + $lowNibble;
+		my $high_nibble = hex($chars[$i]);
+		my $low_nibble  = hex($chars[($i+1)]);
+		my $byte = ($high_nibble * 16) + $low_nibble;
 		my $char = chr($byte);
 		$result = $result.$char;
 	}

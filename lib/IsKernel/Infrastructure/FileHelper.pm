@@ -4,18 +4,13 @@ use warnings;
 use strict;
 use v5.14;
 
-
-
 =pod
 Description:
 	Creates a new instance of FileHelperBase
 Parameters:
 	path - the path to the file used by the logger
-	content - the content of the file
 Returns
 	A reference to the object
-Type:
-	Constructor
 =cut
 sub new
 {
@@ -27,13 +22,11 @@ sub new
 
 =pod
 Description:
-	Returns the path used by the file handler
+	Sets the file path of the object.
 Parameters:
 	None
 Returns
-	The path used by the file handler
-Type:
-	Public
+	None
 =cut
 sub set_path
 {
@@ -44,13 +37,11 @@ sub set_path
 
 =pod
 Description:
-	Sets the path used by the file handler
+	Gets the file path used by the object
 Parameters:
-	path - the new path that will be used by the file handler
+	path - the new path
 Returns
 	None
-Type:
-	Public
 =cut
 sub get_path
 {
@@ -62,13 +53,11 @@ sub get_path
 
 =pod
 Description:
-	Appends the string to the file
+	Appends the string to the object file
 Parameters:
 	message - the message which will be appended
 Returns
 	None
-Type:
-	Public
 =cut
 sub append_to_file
 {
@@ -87,9 +76,7 @@ Description
 Parameters:
 	None
 Returns:
-	An array containing each line of the content
-Type:
-	Public
+	An array containing every line of the content
 =cut
 sub get_content_as_array
 {
@@ -110,8 +97,6 @@ Parameters:
 	None
 Returns:
 	A string containing the entire content of the file
-Type:
-	Public
 =cut
 sub get_content_as_string
 {
@@ -129,14 +114,12 @@ Parameters:
 	content - the content of the file as a scalar
 Returns:
 	Nothing 
-Type:
-	Public
 =cut
 sub write_to_file
 {
-	(my $self, my $message) = @_;
+	(my $self, my $content) = @_;
 	open(my $handle, ">", $self->get_path()) or die("Could not create file at ".$self->get_path());
-	print $handle $message;
+	print $handle $content;
 	close($handle);
 }
 

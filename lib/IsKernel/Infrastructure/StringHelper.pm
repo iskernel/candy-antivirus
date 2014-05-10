@@ -6,7 +6,7 @@ use v5.14;
 
 =pod
 Description:
-	Creates a new RandomStringGenerator object
+	Creates a new object
 Parameters:
 	length - the default length used if otherwise unspecified
 Returns:

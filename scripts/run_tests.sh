@@ -17,5 +17,6 @@ cd $default_dir
 cd test/IsKernel/CandyAntivirus
 perl ConfigurationTests.pl
 perl EngineResponseTests.pl
+perl ScanResponseTests.pl
 perl VirusScannerTests.pl 
 perl EngineTests.pl

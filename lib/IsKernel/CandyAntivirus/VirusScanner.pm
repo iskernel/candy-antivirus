@@ -6,6 +6,7 @@ use v5.14;
 
 use IsKernel::Infrastructure::HexConverter;
 use IsKernel::Infrastructure::FileHelper;
+use IsKernel::CandyAntivirus::ScanResponse;
 
 =pod
 Description:
@@ -14,8 +15,6 @@ Parameters:
 	path - the path to the file used by the logger
 Returns
 	A reference to the object
-Type:
-	Constructor
 =cut
 sub new
 {
@@ -27,7 +26,14 @@ sub new
 	return $self; 
 } 
 
-
+=pod
+Description:
+	Returns the hex converter object
+Parameters:
+	None
+Returns
+	The hex converter object
+=cut
 sub _get_hex_converter()
 {
 	my $self = shift;
@@ -36,26 +42,20 @@ sub _get_hex_converter()
 
 =pod
 Description:
-	Analyzes a string and returns a list of the viruses
-	and viruses signatures found.
+	Scans a content string and returns a scan response 
+	(if the file is infected, and the name of the first detected virus).
 Parameters:
-	path - the path to the file
+	path - the content string
 Returns
-	Returns 1 if hex contains a virus signature.
-	Otherwise returns 0.
-Type:
-	Public
+	A scan response object
 =cut
-sub analyze_content
+sub scan
 {
 	(my $self, my $content) = @_;
 	$content = $self->_get_hex_converter()->ascii_to_hex_dump($content);
 	
-	#Initializes the return array
 	my $result = 0;
-	#Initializes the index of the return array
 	my $index = 0;
-	#Opens the virus signatures database
 	open(my $database_handle, 
 		 "<",
 		 $self->{"path"}
@@ -74,21 +74,21 @@ sub analyze_content
 			last;	#Breaks the loop
 		}
 	}
-	return ($result, $virus_name);
+	my $response = IsKernel::CandyAntivirus::ScanResponse->new($result, $virus_name);
+	return $response;
 }
 
 =pod
 Description:
 	Analyzes a string and removes all virus signatures
 Parameters:
-	path - the path to the file
+	content - the content string
 Returns
-	Returns 1 if hex contains a virus signature.
-	Otherwise returns 0.
+	Returns the content without any virus signatures 
 Type:
 	Public
 =cut
-sub disinfect_content
+sub remove_signatures
 {
 	(my $self, my $content) = @_;
 	$content = $self->_get_hex_converter()->ascii_to_hex_dump($content);	

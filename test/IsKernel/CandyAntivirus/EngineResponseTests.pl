@@ -8,13 +8,13 @@ use IsKernel::CandyAntivirus::EngineResponse;
 
 use constant DEFAULT_RESPONSE => "this is a response";
 
-my $engineResponse = IsKernel::CandyAntivirus::EngineResponse->new(DEFAULT_RESPONSE, 1);
+my $engine_response = IsKernel::CandyAntivirus::EngineResponse->new(DEFAULT_RESPONSE, 1);
 
-ok($engineResponse->get_print_response() eq DEFAULT_RESPONSE, 
+ok($engine_response->get_print_response() eq DEFAULT_RESPONSE, 
    "EngineResponse_GetPrintReponse_NewObject_PrintResponseInitialized");
-ok($engineResponse->get_log_response() =~  m/${\(DEFAULT_RESPONSE)}\s*/, 
+ok($engine_response->get_log_response() =~  m/${\(DEFAULT_RESPONSE)}\s*/, 
    "EngineResponse_GetStatus_NewObject_LogResponseInitialized"); 
-ok($engineResponse->get_status() eq 1, 
+ok($engine_response->get_status() eq 1, 
    "EngineResponse_GetStatus_NewObject_StatusInitialized");
    
 done_testing();

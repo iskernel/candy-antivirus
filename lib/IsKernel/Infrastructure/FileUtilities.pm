@@ -9,13 +9,11 @@ use IsKernel::Infrastructure::StringHelper;
 
 =pod
 Description:
-	Creates a new HexConverter object
+	Creates a new object
 Parameters:
 	None
 Returns:
 	A reference to the object
-Type:
-	Constructor
 =cut
 sub new
 {
@@ -35,8 +33,6 @@ Returns:
 	1 - the file is ordinary, writable and readable
 	0 - the file is ordinary, but is not writable or not readable
 	2 - the file is not ordinary
-Type:
-	Public
 =cut
 sub is_ordinary_file()
 {
@@ -62,7 +58,7 @@ sub is_ordinary_file()
 
 =pod
 Description:
-	Generates a unique filename in regards to the files in a specific directory
+	Generates a unique filename in regards to the files in the specified directory
 Parameters:
 	length - the length of the new filename
 	directory_path - the path to the directory
