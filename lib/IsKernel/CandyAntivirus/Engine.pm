@@ -49,7 +49,7 @@ Parameters:
 Returns:
 	None
 =cut
-sub _set_configuration()
+sub set_configuration()
 {
 	my $self = shift;
 	$self->{"Configuration"} = shift;
@@ -160,21 +160,19 @@ sub get_quarantine_logger()
 Description:
 	Verifies if a file has a virus.
 Parameters:
-	fileManager - a FileManager object containing the path to the scanned file
+	path - the path to the scanned file
 Returns:
-	(hasVirus, virusName)
-	hasVirus = 1 => The file has a virus
-	hasVirus = 0 => The file has no virus
-	virusName - the name of the virus, if any
+	A scan response object
 Type:
 	Public
 =cut
-sub has_virus()
+sub action_detect()
 {
-	(my $self, my $file_helper) = @_;
+	(my $self, my $path) = @_;
+	my $file_helper = IsKernel::Infrastructure::FileHelper->new($path);
 	my $content = $file_helper->get_content_as_string();
-	(my $hasVirus, my $virusName) = $self->getScanner()->analyze_content($content);
-	return ($hasVirus, $virusName);
+	my $response = $self->get_scanner()->scan($content);
+	return $response;
 }
 
 =pod
@@ -303,7 +301,7 @@ Returns:
 Type:
 	Public
 =cut
-sub download_new_definitions()
+sub action_update_definitions()
 {
 	my $self = shift;
 	my $content = get($self->get_configuration()->get_path_to_www_database()) 
@@ -349,7 +347,7 @@ Returns:
 Type:
 	Public
 =cut
-sub restore_quarantined_file()
+sub action_restore_quarantined_file()
 {
 	my $self = shift;
 	my $path = shift;
@@ -402,7 +400,7 @@ Returns:
 Type:
 	Public
 =cut
-sub set_scan_extensions
+sub action_set_extensions
 {
 	my $self= shift;
 	my $new_extensions = shift;
@@ -410,21 +408,19 @@ sub set_scan_extensions
 }
 =pod
 Description:
-	Verifies if a file has one of the specified extensions
+	Verifies if a file's extension is a specified extesion 
 Parameters:
 	path - the path to the file
 Returns:
 	1 - the file should be scanned
 	0 - the file should be skipped
-Type:
-	Public
 =cut
-sub verify_extension()
+sub action_check_extension()
 {
 	my $self = shift;
 	my $path = shift;
 	my $result = 0;
-	my $extension_content = $self->get_configuration()->get_extensions();
+	my $extension_content = $self->get_configuration()->get_extensions_option();
 	if($extension_content eq ALL_EXTENSIONS)
 	{
 		$result = 1;
