@@ -4,6 +4,8 @@ use warnings;
 use strict;
 use v5.14;
 
+use File::Spec;
+
 use constant VIRUS_DATABASE_PATH_ID =>"VIRUS_SIGNATURES_PATH";
 use constant QUARANTINE_PATH_ID => "QUARANTINE_PATH";
 use constant DEFAULT_WORKING_DIRECTORY_PATH_ID => "DEFAULT_WORKING_DIRECTORY_PATH";
@@ -337,5 +339,21 @@ sub save_settings
 	print $handle $content;
 }
 
-#END OF MODULE
+=pod
+Description:
+	Writes the settings to the configuraion file
+Parameters:
+	None
+Returns
+	None
+=cut
+sub make_paths_absolute
+{
+	my $self = shift;
+	$self->set_path_to_log(File::Spec->rel2abs( $self->get_path_to_log() ));
+	$self->set_path_to_quarantine_log(File::Spec->rel2abs( $self->get_path_to_quarantine_log() ));
+	$self->set_virus_database_path(File::Spec->rel2abs( $self->get_virus_database_path() ));
+	$self->set_default_working_drectory(File::Spec->rel2abs ($self->get_default_working_directory_path() ) );
+}
+
 1;
