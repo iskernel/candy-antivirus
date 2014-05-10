@@ -13,6 +13,7 @@ use IsKernel::Infrastructure::FileHelper;
 use IsKernel::Infrastructure::StringHelper;
 use IsKernel::CandyAntivirus::Configuration;
 use IsKernel::CandyAntivirus::VirusScanner;
+use IsKernel::CandyAntivirus::EngineResponse;
 
 #The length of a random filename used by a quarantined file
 use constant RANDOM_FILENAME_LENGTH => 30;
@@ -32,35 +33,15 @@ Type:
 sub new
 {
 	(my $class, my $configuration, my $directory) = @_;
-	my $self = {};
-	
+	my $self = {};	
 	$self->{"Configuration"} = $configuration;
 	$self->{"Scanner"} = IsKernel::CandyAntivirus::VirusScanner->new($configuration->get_virus_database_path());
-	#$self->{"HexConverter"} = IsKernel::Infrastructure::HexConverter->new();
-	$self->{"EventLogger"} = IsKernel::CandyAntivirus::FileHelper->new($configuration->get_path_to_log());
-	$self->{"QuarantineLogger"} = IsKernel::CandyAntivirus::FileHelper->new($configuration->get_path_to_quarantine_log());
-	#$self->{"RandomFilenameGenerator"} = IsKernel::CandyAntivirus::StringHelper->new(RANDOM_FILENAME_LENGTH);
-	$self->set_working_directory($directory);	
+	$self->{"EventLogger"} = IsKernel::Infrastructure::FileHelper->new($configuration->get_path_to_log());
+	$self->{"QuarantineLogger"} = IsKernel::Infrastructure::FileHelper->new($configuration->get_path_to_quarantine_log());	
 	bless $self, $class;
+	$self->set_working_directory($directory);
 	return $self;
 }
-
-=pod
-Description:
-	Returns the hex converter
-Parameters:
-	None
-Returns:
-	The hex converter
-Type:
-	Constructor
-
-sub get_hex_converter()
-{
-	my $self = shift;
-	return $self->{"HexConverter"};
-}
-=cut
 
 =pod
 Description:
@@ -77,6 +58,7 @@ sub set_configuration()
 	my $self = shift;
 	$self->{"Configuration"} = shift;
 }
+
 =pod
 Description:
 	Changes the working directory
@@ -97,17 +79,18 @@ sub set_working_directory()
 		if(-d $directory)
 		{
 			$self->{"Directory"} = $directory;
-			$response = IsKernel::CandyAntivirus::EngineResponse->new("Directory set");
 		}
 		else
 		{
-			$self->{"Directory"} = $self->get_configuration()->get_default_working_directory();			
+			$self->{"Directory"} = $self->get_configuration()->get_default_working_directory_path();			
 		}
 	}
 	else
 	{		
-		$self->{"Directory"} = $self->get_configuration()->get_default_working_directory();
+		$self->{"Directory"} = $self->get_configuration()->get_default_working_directory_path();
 	}
+	$response = IsKernel::CandyAntivirus::EngineResponse->new("Directory set to ".$self->{"Directory"});
+	return $response;
 }
 =pod
 Description:
@@ -191,22 +174,6 @@ sub get_quarantine_logger()
 
 =pod
 Description:
-	Returns the random filename generator used by the Engine
-Parameters:
-	None
-Returns:
-	The random filename generator used by the engine
-Type:
-	Private
-=cut
-sub get_random_filename_generator()
-{
-	my $self = shift;
-	return $self->{"RandomFilenameGenerator"};
-}
-
-=pod
-Description:
 	Verifies if a file has a virus.
 Parameters:
 	fileManager - a FileManager object containing the path to the scanned file
@@ -230,42 +197,33 @@ sub has_virus()
 Description:
 	Deletes a file
 Parameters:
-	fileManager - a FileManager object containing the path to the scanned file
+	path - the path to the deleted file
 Returns:
-	(retVal, printResponse)
-	retVal = 1 => The file was deleted successfully
-	retVal = 0 => The file was not deleted
-	printResponse - a message detailing the result of the operation
+	engine_response - object containing a message and the operation stats
 Type:
 	Public
 =cut
-sub delete_action
+sub action_delete()
 {
-	(my $self, my $file_manager) = @_;
-	my $result = unlink($file_manager->getPath());
+	(my $self, my $path) = @_;
+	my $result = unlink($path);
+	my $response = undef;
 	
-	my $now_time = localtime;
-	
-	my $print_response = undef;
-	my $log_response = undef;
-	my $ret_val = undef;
 	#The file was deleted successfully
 	if($result)
-	{
-		$print_response = $file_manager->get_path()." "."was deleted from system\n";
-		$log_response = $now_time." ".$print_response;
-		$ret_val = 1;
+	{		
+		my $to_print = $path." "."was deleted from system\n";
+		$response = IsKernel::Infrastructure::EngineResponse->new($to_print, 1);		
 	}
 	#The file was not deleted successfully
 	else
 	{
-		$print_response = $file_manager->get_path()." "."was NOT deleted from system\n";
-		$log_response = $now_time." ".$print_response;
-		$ret_val = 0;
+		my $to_print = $path." "."was NOT deleted from system\n";
+		$response = IsKernel::Infrastructure::EngineResponse->new($to_print, 0);
 	}
 	#Writes to log file
-	$self->get_event_logger()->append_to_file($log_response);
-	return ($ret_val, $print_response);
+	$self->get_event_logger()->append_to_file($response->get_log_response());
+	return $response;
 }
 
 =pod
@@ -281,7 +239,7 @@ Returns:
 Type:
 	Public
 =cut
-sub quarantine_action
+sub action_quarantine()
 {
 	(my $self, my $file_manager) = @_;
 	
@@ -338,7 +296,7 @@ Returns:
 Type:
 	Public
 =cut
-sub disinfect_action()
+sub action_disinfect()
 {
 	(my $self, my $file_manager) = @_;
 	my $file_content = $file_manager->get_content_as_string();
@@ -358,21 +316,7 @@ sub disinfect_action()
 	
 	return (1,$print_response);	
 }
-=pod
-Description:
-	Returns the content of the log file
-Parameters:
-	None
-Returns:
-	The content of the log file
-Type:
-	Public
-=cut
-sub get_log_file_content()
-{
-	my $self = shift;
-	return $self->get_event_logger()->get_content_as_string();
-}
+
 =pod
 Description:
 	Downloads new virus definitions from the internetz and saves them

@@ -8,6 +8,7 @@ export PERL5LIB=$default_dir/lib
 #Run infrastructure tests
 cd test/IsKernel/Infrastructure
 perl FileHelperTests.pl
+perl FileUtilitiesTests.pl
 perl HexConverterTests.pl 
 perl StringHelperTests.pl 
 
@@ -15,5 +16,6 @@ perl StringHelperTests.pl
 cd $default_dir
 cd test/IsKernel/CandyAntivirus
 perl ConfigurationTests.pl
+perl EngineResponseTests.pl
 perl VirusScannerTests.pl 
 perl EngineTests.pl
