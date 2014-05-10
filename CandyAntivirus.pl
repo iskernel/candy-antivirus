@@ -6,6 +6,7 @@ use v5.14;
 
 use File::Find;
 
+use IsKernel::Infrastructure::FileUtilities;
 use IsKernel::CandyAntivirus::Configuration;
 use IsKernel::CandyAntivirus::Engine;
 
@@ -25,104 +26,53 @@ use constant MAIN_MENU_TEXT
 				"[6]Configure scan filter\n".
 				"[7]Exit\n";
 
+#Loads the configuration file and settings
+my $configuration = IsKernel::CandyAntivirus::Configuration->new(PATH_TO_CONFIG);
+my $engine = IsKernel::CandyAntivirus::Engine->new($configuration, $ARGV[0]);
+$engine->get_event_logger()->init_session();
+
+#Initializes the program loop
+my $loop_keeper = LOOP_RUNNING;
+
+#Runs the main menu
+while($loop_keeper==LOOP_RUNNING)
+{
+	say("The working directory is: ".$engine->get_working_directory());
+	print(MAIN_MENU_TEXT);
+	my $key = <STDIN>;
+	chomp($key);
+	do_actions($engine, $key);
+}
+
 sub do_actions
 {
 	(my $engine, my $key) = @_;
-	#Folder scan will be started
 	if($key=="1")
 	{
-		find(\&treatFile, $engine->get_working_directory());			
+		scan_files($engine);	
 	}
-	#Displayes the scan log
 	elsif($key=="2")
 	{
-		say($engine->get_event_logger()->get_content_as_string());		
+		show_scan_log($engine);
 	}
-	#Changes the path of the working directory
 	elsif($key=="3")
 	{
-		say("Write the new working directory path: ");
-		my $new_directory = <STDIN>;
-		chomp($new_directory);
-		my $set_response = $engine->set_working_directory($new_directory);
-		say($set_response->get_print_response());
+		change_working_directory($engine);
 	}
-	#Loads new definitions
 	elsif($key=="4")
 	{
-		eval
-		{
-			$engine->action_update_definition();
-		};
-		if(@_)
-		{
-			say("Could not download new definitions from online database");
-		}
+		update_definitions($engine);	
 	}
-	#Restore files kept in quarantine
 	elsif($key=="5")
 	{
-		my @files = $engine->action_get_quarantined_files();
-		my $index = 0;
-		if(scalar(@files)>0)
-		{
-			say("Select which file you want to restore: ");
-			foreach my $file(@files)
-			{
-				say("[".$index."]".$file);
-				$index++;
-			}
-			say("[".$index."] Return to menu");
-			my $restore_key = <STDIN>;
-			chomp($restore_key);
-			if( ($restore_key=~m/^\d$/) && ($restore_key >= 0) && ($restore_key <= $index) )
-			{
-				my $new_index = 0;
-				my $chosen_file = undef;
-				foreach my $file(@files)
-				{
-					if($new_index eq $restore_key)
-					{
-						$chosen_file = $file;
-					}
-					$new_index++;
-				}
-				if(defined $chosen_file)
-				{
-					my $response = $engine->action_restore_quarantined_file($chosen_file);
-					say $response->get_print_response();
-					if($response->get_status() ==0)
-					{
-						say("Original file couldn't be deleted from quarantine.");
-					}	
-				}
-			}
-			else
-			{
-				say("Incorrect value scanned. Press any key to return to the main menu");
-			} 
-		}
-		else
-		{
-			say("There no files currently quarantined");
-		}
+		restore_from_quarantine($engine);
 	}
-	#Configures scan filter
 	elsif($key=="6")
 	{
-		say("Enter the extensions of the files you want scanned separated by space:\n".
-			"Write \"all\" or leave blank if you want to scan every file");
-		my $extensions = <STDIN>;
-		chomp($extensions);
-		if($extensions eq "")
-		{
-			$extensions = "all";
-		}
-		$engine->action_set_extensons($extensions);	
+		configure_scan_filter($engine);	
 	}
 	elsif($key=="7")
-	{
-		#Exits the program	
+	{	
 		$engine->get_event_logger()->close_session();
 		exit(0);
 	}
@@ -132,88 +82,167 @@ sub do_actions
 	}	
 }
 
-#Loads the configuration file and settings
-my $configuration = IsKernel::CandyAntivirus::Configuration->new(PATH_TO_CONFIG);
-my $engine = IsKernel::CandyAntivirus::Engine->new($configuration, $ARGV[0]);
-$engine->get_event_logger()->init_session();
-
-#Initializes the program loop
-my $loopKeeper = LOOP_RUNNING;
-
-#Runs the main menu
-while($loopKeeper==LOOP_RUNNING)
+sub scan_files
 {
-	say("The working directory is: ".$engine->getWorkingDirectory());
-	print(MAIN_MENU_TEXT);
-	my $key = <STDIN>;
-	chomp($key);
-	do_actions($engine, $key);
+	my $engine = shift;
+	find(\&treat_file, $engine->get_working_directory());	
 }
 
-sub treatFile
+sub show_scan_log
+{
+	my $engine = shift;
+	my $content = $engine->get_event_logger()->get_content_as_string();
+	say($content);			
+}
+
+sub change_working_directory
+{
+	my $engine = shift;
+	say("Write the new working directory path: ");
+	my $new_directory = <STDIN>;
+	chomp($new_directory);
+	my $set_response = $engine->set_working_directory($new_directory);
+	say($set_response->get_print_response());
+}
+
+sub update_definitions
+{
+	my $engine = shift;
+	eval
+	{
+		$engine->action_update_definition();
+	};
+	if(@_)
+	{
+		say("Could not download new definitions from online database");
+	}
+}
+
+sub restore_from_quarantine
+{
+	my $engine = shift;
+	my @files = $engine->get_quarantined_files();
+	my $index = 0;
+	if(scalar(@files) > 0)
+	{
+		say("Select which file you want to restore: ");
+		foreach my $file (@files)
+		{
+			say("[".$index."]".$file);
+			$index++;
+		}
+		say("[".$index."] Return to menu");
+		my $restore_key = <STDIN>;
+		chomp($restore_key);
+		if( ($restore_key=~m/^\d$/) && ($restore_key >= 0) && ($restore_key <= $index) )
+		{
+			my $new_index = 0;
+			my $chosen_file = undef;
+			foreach my $file(@files)
+			{
+				if($new_index eq $restore_key)
+				{
+					$chosen_file = $file;
+				}
+				$new_index++;
+			}
+			if(defined $chosen_file)
+			{
+				my $response = $engine->action_restore_quarantined_file($chosen_file);
+				say $response->get_print_response();
+				if($response->get_status() ==0)
+				{
+					say("Original file couldn't be deleted from quarantine.");
+				}	
+			}
+		}
+		else
+		{
+			say("Incorrect value scanned. Press any key to return to the main menu");
+		} 
+	}
+	else
+	{
+		say("There no files currently quarantined");
+	}
+}
+
+sub configure_scan_filter
+{
+	my $engine = shift;
+	say("Enter the extensions of the files you want scanned separated by space:\n".
+		"Write \"all\" or leave blank if you want to scan every file");
+	my $extensions = <STDIN>;
+	chomp($extensions);
+	if($extensions eq "")
+	{
+		$extensions = "all";
+	}
+	$engine->action_set_extensions($extensions);
+}
+
+sub treat_file
 {
 	my $path = $File::Find::name;
-
-	my $result = $engine->verifyFile($path);
+	my $file_utilities = IsKernel::Infrastructure::FileUtilities->new();
+	my $result = $file_utilities->is_ordinary_file($path);
+	
 	if($result==1)
 	{
-		my $extResult = $engine->verifyExtension($path);
-		if($extResult==1)
+		my $extension_response = $engine->action_check_extension($path);
+		if($extension_response==1)
 		{
-			my $fileManager = Com::IsKernel::Libs::FileHandling::FileManager->new($path);
-			(my $hasVirus, my $virusName) = $engine->hasVirus($fileManager);
-			if($hasVirus==1)
+			my $scan_response = $engine->action_detect($path);
+			if($scan_response->has_virus()==1)
 			{
-				my $menuText = 
-					$virusName." was detected at: ".$fileManager->getPath()." .How should I proceed?\n".
-					"[1]Delete file permanently\n".
-					"[2]Send file to quarantine\n".
-					"[3]Disinfect file\n";
-				
-				my $loopKeeper = LOOP_RUNNING;
-				while($loopKeeper==LOOP_RUNNING)
+				my $menu_text =  $scan_response->virus_name()." was detected at: ".$path." .How should I proceed?\n"
+								."[1]Delete file permanently\n"
+								."[2]Send file to quarantine\n"
+								."[3]Disinfect file\n";				
+				my $loop_keeper = LOOP_RUNNING;
+				while($loop_keeper==LOOP_RUNNING)
 				{
-					print $menuText;
+					print $menu_text;
 					my $key = <STDIN>;
 					chomp($key);
-					$loopKeeper = LOOP_STOPPED;
+					$loop_keeper = LOOP_STOPPED;
 					if($key=="1")
 					{
-						(my $response, my $message) = $engine->deleteAction($fileManager);
-						print $message;
-						if($response ==0)
+						my $delete_response= $engine->action_delete($path);
+						print $delete_response->get_print_response();
+						if($delete_response->get_status() ==0)
 						{
-							$loopKeeper = LOOP_RUNNING;
+							$loop_keeper = LOOP_RUNNING;
 						}
 					}
 					elsif($key=="2")
 					{
-						(my $response, my $message) = $engine->quarantineAction($fileManager);
-						print $message;
-						if($response ==0)
+						my $quarantine_response = $engine->action_quarantine($path);
+						print $quarantine_response->get_print_response();
+						if($quarantine_response->get_status() ==0)
 						{
-							$loopKeeper = LOOP_RUNNING;
+							$loop_keeper = LOOP_RUNNING;
 						}
 					}
 					elsif($key=="3")
 					{
-						(my $response, my $message) = $engine->disinfectAction($fileManager);
-						print $message;
-						if($response ==0)
+						my $disinfect_response = $engine->action_disinfect($path);
+						print $disinfect_response->get_print_response();
+						if($disinfect_response->get_status() ==0)
 						{
-							$loopKeeper = LOOP_RUNNING;
+							$loop_keeper = LOOP_RUNNING;
 						}
 					}
 					else
 					{
 						say("Incorrect input. Please give another answer");
-						$loopKeeper = LOOP_RUNNING;
+						$loop_keeper = LOOP_RUNNING;
 					}
 				}
 			}
 			else
 			{
-				say($fileManager->getPath()." is not infected");
+				say($path." is not infected");
 			}
 		}
 		else

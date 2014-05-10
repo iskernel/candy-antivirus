@@ -393,7 +393,7 @@ sub action_set_extensions
 {
 	my $self= shift;
 	my $new_extensions = shift;
-	$self->get_configuration()->set_extensions($new_extensions);
+	$self->get_configuration()->set_extension_option($new_extensions);
 }
 =pod
 Description:

@@ -56,6 +56,7 @@ sub scan
 	
 	my $result = 0;
 	my $index = 0;
+	print $self->{"path"};
 	open(my $database_handle, 
 		 "<",
 		 $self->{"path"}
