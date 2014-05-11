@@ -354,6 +354,7 @@ sub make_paths_absolute
 	$self->set_path_to_quarantine_log(File::Spec->rel2abs( $self->get_path_to_quarantine_log() ));
 	$self->set_virus_database_path(File::Spec->rel2abs( $self->get_virus_database_path() ));
 	$self->set_default_working_drectory(File::Spec->rel2abs ($self->get_default_working_directory_path() ) );
+	$self->set_quarantine_path(File::Spec->rel2abs ($self->get_quarantine_path()) );
 }
 
 1;

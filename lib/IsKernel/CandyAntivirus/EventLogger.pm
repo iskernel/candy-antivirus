@@ -48,7 +48,7 @@ Returns:
 sub close_session
 {
 	my $self = shift;
-	$self->append_to_file("===Session started at ".localtime."===\n")
+	$self->append_to_file("===Session ended at ".localtime."===\n")
 }
 
 1;
