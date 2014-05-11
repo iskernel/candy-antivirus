@@ -31,3 +31,28 @@
 ===Session started at Sun May 11 04:12:44 2014===
 ===Session ended at Sun May 11 04:12:55 2014===
 ===Session started at Sun May 11 04:22:35 2014===
+===Session started at Sun May 11 04:32:55 2014===
+Sun May 11 04:33:24 2014 /home/bogdan/virus/f2d1/f2d2/multi.exe was quarantined from system
+Sun May 11 04:33:25 2014 /home/bogdan/virus/f2d1/f2d2/trivial.exe was quarantined from system
+Sun May 11 04:33:26 2014 /home/bogdan/virus/f1d1/badguy.txt was quarantined from system
+Sun May 11 04:33:27 2014 /home/bogdan/virus/f1d1/f1d2/russianmirror.exe was quarantined from system
+Sun May 11 04:33:28 2014 /home/bogdan/virus/f1d1/f1d2/f1d3/simplex.txt was deleted from system
+Sun May 11 04:33:29 2014 /home/bogdan/virus/f1d1/f1d2/f1d3/f1d4/abraxas.exe was deleted from system
+Sun May 11 04:33:51 2014 /home/bogdan/virus/f2d1/f2d2/multi.exe was restored successfully
+Sun May 11 04:34:08 2014 /home/bogdan/virus/f2d1/f2d2/multi.exe was quarantined from system
+===Session started at Sun May 11 05:03:07 2014===
+Sun May 11 05:03:15 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/russianmirror.exe was deleted from system
+Sun May 11 05:03:17 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/badguy.txt was deleted from system
+Sun May 11 05:03:18 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/simplex.txt was deleted from system
+Sun May 11 05:03:18 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/trivial.exe was deleted from system
+Sun May 11 05:03:19 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/abraxas.exe was deleted from system
+===Session ended at Sun May 11 05:03:23 2014===
+===Session started at Sun May 11 05:03:31 2014===
+===Session started at Sun May 11 05:05:09 2014===
+===Session started at Sun May 11 05:12:07 2014===
+Sun May 11 05:12:32 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/russianmirror.exe was deleted from system
+Sun May 11 05:12:32 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/badguy.txt was deleted from system
+Sun May 11 05:12:32 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/simplex.txt was deleted from system
+Sun May 11 05:12:32 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/trivial.exe was deleted from system
+Sun May 11 05:12:32 2014 /home/bogdan/Dropbox/SW/perl/candy-antivirus/test/Scenario/abraxas.exe was deleted from system
+===Session ended at Sun May 11 05:12:45 2014===
